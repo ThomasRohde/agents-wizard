@@ -18,9 +18,7 @@ interface ConflictWarning {
 
 const App: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('core-principles');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    new Set(SECTIONS.filter(s => s.recommended).map(s => s.id))
-  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [selectedStacks, setSelectedStacks] = useState<Set<Stack>>(new Set(['universal']));
