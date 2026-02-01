@@ -2,19 +2,70 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Agents Wizard
 
-This contains everything you need to run your app locally.
+A visual tool to assemble your `AGENTS.md` file for agentic coding. Select from curated sections covering core principles, code style, communication guidelines, and more to create comprehensive instructions for AI coding agents.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1-TK-8r_r3qaFEwqY7o_1H0JMqasUJQVz
+**Live Demo:** [https://thomasrohde.github.io/agents-wizard](https://thomasrohde.github.io/agents-wizard)
+
+## Features
+
+- 🎯 Curated collection of best-practice coding instructions for AI agents
+- 📝 Live preview of generated AGENTS.md content
+- 📋 One-click copy to clipboard
+- 💾 Download as file
+- 🎨 Beautiful dark theme UI
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js 20+
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+
+2. Run the app:
+   ```bash
+   npm run dev
+   ```
+
+3. Open [http://localhost:3000/agents-wizard/](http://localhost:3000/agents-wizard/)
+
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview production build locally |
+| `npm run typecheck` | Run TypeScript type checking |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Fix ESLint issues |
+| `npm run format` | Format code with Prettier |
+| `npm run format:check` | Check code formatting |
+
+## Deployment
+
+The app is automatically deployed to GitHub Pages when pushing to the `main` branch via GitHub Actions.
+
+### Manual Deployment
+
+1. Build the app:
+   ```bash
+   npm run build
+   ```
+
+2. The `dist/` folder contains the production-ready files.
+
+## Tech Stack
+
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- Lucide React (icons)
+
+## License
+
+MIT © Thomas Klok Rohde

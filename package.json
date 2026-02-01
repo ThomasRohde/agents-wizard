@@ -1,22 +1,48 @@
 {
   "name": "agents-wizard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Assemble your AGENTS.md for agentic coding",
   "type": "module",
+  "author": "Thomas Klok Rohde <rohde.thomas@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://thomasrohde.github.io/agents-wizard",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasrohde/agents-wizard.git"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "dependencies": {
-    "react": "^19.2.4",
-    "@google/genai": "^1.39.0",
     "lucide-react": "^0.563.0",
+    "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^22.14.0",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.24",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "postcss": "^8.5.6",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4.1.18",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }

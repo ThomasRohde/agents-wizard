@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Download, Check, RefreshCw } from 'lucide-react';
+import { Copy, Download, Check } from 'lucide-react';
 import Button from './Button';
 
 interface PreviewProps {
@@ -58,7 +58,7 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
       
       <div className="flex-1 overflow-auto bg-[#0d1117] relative group">
         <pre className="p-6 text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap selection:bg-indigo-500/30">
-          {content || <span className="text-slate-600 italic">// Select modules from the left to build your file...</span>}
+          {content || <span className="text-slate-600 italic">Select modules from the left to build your file...</span>}
         </pre>
       </div>
     </div>
