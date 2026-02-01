@@ -51,6 +51,18 @@ export const GROUPS: SectionGroup[] = [
     description: 'Personas for the Agent (Senior, Tech Lead, etc).',
     icon: <Brain className="w-4 h-4" /> 
   },
+  { 
+    label: 'Agent Engineering', 
+    value: 'agent-engineering', 
+    description: 'Agent loops, skills, marketplaces, memory, and tool integration.',
+    icon: <Brain className="w-4 h-4" /> 
+  },
+  { 
+    label: 'AI Security & Guardrails', 
+    value: 'ai-security', 
+    description: 'Prompt injection, tool misuse, and output handling for LLM-powered systems.',
+    icon: <Shield className="w-4 h-4" /> 
+  },
 ];
 
 export const SECTIONS: Section[] = [
@@ -370,6 +382,39 @@ export const SECTIONS: Section[] = [
 - **Imports**: Include necessary imports at the top of code snippets.
 - **Comments**: Comment complex logic, but avoid commenting obvious code.
 - **File Names**: Suggest file names and paths for the generated code.
+`
+  },
+
+  // --- Agent Engineering ---
+  {
+    id: 'agents-md-format',
+    title: 'AGENTS.md: Repo Instructions for Agents',
+    category: 'agent-engineering',
+    description: 'A predictable "README for agents" format for repo-specific setup, workflows, and constraints.',
+    recommended: true,
+    content: `## AGENTS.md: Repo Instructions for Agents
+- **Purpose**: Create an \`AGENTS.md\` file in your repository root to provide AI agents with structured, predictable instructions.
+- **Format**: Use markdown with clear sections (Setup, Workflows, Constraints, Testing).
+- **Setup**: Document dependencies, environment variables, and initialization steps.
+- **Workflows**: Describe common development tasks (e.g., "How to add a new feature", "How to run tests").
+- **Constraints**: Specify coding standards, prohibited patterns, and architecture decisions.
+- **Testing**: Include test commands, coverage requirements, and integration test setup.
+- **Benefits**: Reduces hallucinations, ensures consistency, and makes onboarding faster for both humans and agents.
+`
+  },
+  {
+    id: 'rules-skills-commands-split',
+    title: 'Rules vs Skills vs Commands',
+    category: 'agent-engineering',
+    description: 'A scalable way to grow your agent instructions without bloating the always-on context.',
+    recommended: true,
+    content: `## Rules vs Skills vs Commands
+- **Rules**: Always-on constraints and guidelines that apply to every interaction (e.g., "Never use \`any\` type", "Always write tests").
+- **Skills**: Modular, context-specific instructions that can be loaded on-demand (e.g., "How to implement authentication", "How to optimize database queries").
+- **Commands**: Explicit, one-time actions triggered by the user (e.g., "/refactor", "/add-tests").
+- **Strategy**: Keep Rules minimal and universal. Extract specialized knowledge into Skills. Use Commands for interactive workflows.
+- **Storage**: Rules live in the system prompt. Skills are stored in separate files or a vector database. Commands are registered in a command registry.
+- **Benefits**: Reduces token usage, improves response speed, and makes it easier to update specific behaviors without rewriting the entire prompt.
 `
   }
 ];

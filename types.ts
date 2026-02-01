@@ -17,7 +17,9 @@ export type Category =
   | 'security'
   | 'devops' 
   | 'testing' 
-  | 'ai-guidelines';
+  | 'ai-guidelines'
+  | 'agent-engineering'
+  | 'ai-security';
 
 export interface SectionGroup {
   label: string;
@@ -27,3 +29,8 @@ export interface SectionGroup {
 }
 
 export type ViewMode = 'edit' | 'preview';
+
+export interface SearchResult {
+  section: Section;
+  score: number;
+}

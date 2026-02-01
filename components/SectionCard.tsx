@@ -1,14 +1,15 @@
 import React from 'react';
 import { Section } from '../types';
-import { CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2, Circle, TrendingUp } from 'lucide-react';
 
 interface SectionCardProps {
   section: Section;
   isSelected: boolean;
   onToggle: (id: string) => void;
+  searchScore?: number;
 }
 
-const SectionCard: React.FC<SectionCardProps> = ({ section, isSelected, onToggle }) => {
+const SectionCard: React.FC<SectionCardProps> = ({ section, isSelected, onToggle, searchScore }) => {
   return (
     <div 
       onClick={() => onToggle(section.id)}
@@ -21,10 +22,18 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, isSelected, onToggle
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
-          <h3 className={`font-semibold mb-1 ${isSelected ? 'text-indigo-300' : 'text-slate-200'}`}>
-            {section.title}
-          </h3>
-          <p className="text-sm text-slate-400 group-hover:text-slate-300 leading-relaxed">
+          <div className="flex items-center gap-2">
+            <h3 className={`font-semibold ${isSelected ? 'text-indigo-300' : 'text-slate-200'}`}>
+              {section.title}
+            </h3>
+            {searchScore !== undefined && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-medium rounded">
+                <TrendingUp className="w-3 h-3" />
+                {searchScore.toFixed(1)}
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-slate-400 group-hover:text-slate-300 leading-relaxed mt-1">`
             {section.description}
           </p>
         </div>
