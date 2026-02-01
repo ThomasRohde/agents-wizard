@@ -1,6 +1,29 @@
 import React from 'react';
-import { Section, SectionGroup } from './types';
+import { Section, SectionGroup, Stack } from './types';
 import { BookOpen, Code, Server, Database, Shield, Container, TestTube, Brain } from 'lucide-react';
+
+// Available stacks for manual filtering UI
+export const STACKS: { value: Stack; label: string }[] = [
+  { value: 'universal', label: 'Universal' },
+  { value: 'react', label: 'React' },
+  { value: 'nextjs', label: 'Next.js' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'node', label: 'Node.js' },
+  { value: 'python', label: 'Python' },
+  { value: 'go', label: 'Go' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'sql', label: 'SQL' },
+  { value: 'nosql', label: 'NoSQL' },
+  { value: 'graphql', label: 'GraphQL' },
+  { value: 'rest', label: 'REST API' },
+  { value: 'docker', label: 'Docker' },
+  { value: 'kubernetes', label: 'Kubernetes' },
+  { value: 'aws', label: 'AWS' },
+  { value: 'azure', label: 'Azure' },
+  { value: 'gcp', label: 'GCP' },
+];
 
 export const GROUPS: SectionGroup[] = [
   { 
@@ -73,6 +96,8 @@ export const SECTIONS: Section[] = [
     category: 'core-principles',
     description: 'Timeless advice from The Pragmatic Programmer.',
     recommended: true,
+    tags: ['fundamentals', 'design', 'best-practices', 'dry', 'maintainability'],
+    appliesTo: ['universal'],
     content: `## Pragmatic Philosophy (The Pragmatic Programmer)
 - **ETC (Easier To Change)**: Good design is easier to change than bad design. Always ask: "Does this make the code easier to change?"
 - **DRY (Don't Repeat Yourself)**: Every piece of knowledge must have a single, unambiguous, authoritative representation within a system.
@@ -87,6 +112,8 @@ export const SECTIONS: Section[] = [
     category: 'core-principles',
     description: 'Hexagonal / Onion Architecture patterns.',
     recommended: true,
+    tags: ['architecture', 'hexagonal', 'onion', 'ports-adapters', 'layers'],
+    appliesTo: ['universal'],
     content: `## Clean Architecture (Ports & Adapters)
 - **Dependency Rule**: Source code dependencies must point only inward, toward high-level policies.
 - **Entities**: Encapsulate Enterprise wide business rules.
@@ -100,6 +127,8 @@ export const SECTIONS: Section[] = [
     title: 'SOLID Principles',
     category: 'core-principles',
     description: 'Object-Oriented Design Principles.',
+    tags: ['oop', 'design-patterns', 'srp', 'ocp', 'lsp', 'isp', 'dip'],
+    appliesTo: ['universal'],
     content: `## SOLID Principles
 - **SRP (Single Responsibility)**: A class should have one, and only one, reason to change.
 - **OCP (Open/Closed)**: Software entities should be open for extension, but closed for modification.
@@ -113,6 +142,9 @@ export const SECTIONS: Section[] = [
     title: 'Domain-Driven Design',
     category: 'core-principles',
     description: 'Strategic design, ubiquitous language, and bounded contexts.',
+    tags: ['ddd', 'domain', 'aggregates', 'entities', 'bounded-context'],
+    appliesTo: ['universal'],
+    requires: ['clean-architecture'],
     content: `## Domain-Driven Design (DDD)
 - **Ubiquitous Language**: Use the same language in the code as the domain experts use in conversation.
 - **Bounded Contexts**: Explicitly define the boundaries within which a particular model applies.
@@ -125,6 +157,8 @@ export const SECTIONS: Section[] = [
     title: 'The Twelve-Factor App',
     category: 'core-principles',
     description: 'Methodology for building software-as-a-service apps.',
+    tags: ['saas', 'cloud-native', 'microservices', 'config', 'deployment'],
+    appliesTo: ['docker', 'kubernetes', 'aws', 'azure', 'gcp'],
     content: `## The Twelve-Factor App
 1. **Codebase**: One codebase tracked in revision control, many deploys.
 2. **Dependencies**: Explicitly declare and isolate dependencies.
@@ -148,6 +182,9 @@ export const SECTIONS: Section[] = [
     category: 'frontend',
     description: 'Hooks, Functional Components, and composition.',
     recommended: true,
+    tags: ['react', 'hooks', 'functional-components', 'composition', 'state'],
+    appliesTo: ['react', 'nextjs'],
+    conflictsWith: ['vue-best-practices', 'angular-best-practices'],
     content: `## Modern React Best Practices
 - **Functional Components**: Use functional components with Hooks. Avoid class components.
 - **Composition over Inheritance**: Build complex UIs by combining small, isolated components.
@@ -162,6 +199,8 @@ export const SECTIONS: Section[] = [
     category: 'frontend',
     description: 'Type safety, Generics, and avoiding "any".',
     recommended: true,
+    tags: ['typescript', 'types', 'generics', 'strict', 'zod'],
+    appliesTo: ['typescript', 'react', 'nextjs', 'node', 'angular'],
     content: `## TypeScript Guidelines
 - **Strict Mode**: \`"strict": true\` must be enabled in \`tsconfig.json\`.
 - **No Any**: Avoid \`any\`. Use \`unknown\` if the type is truly not known yet, and narrow it down with type guards.
@@ -175,6 +214,9 @@ export const SECTIONS: Section[] = [
     title: 'Next.js App Router',
     category: 'frontend',
     description: 'Server Components, Streaming, and Layouts.',
+    tags: ['nextjs', 'rsc', 'server-components', 'app-router', 'streaming'],
+    appliesTo: ['nextjs'],
+    requires: ['modern-react', 'typescript-strict'],
     content: `## Next.js App Router Guidelines
 - **Server Components by Default**: Use Server Components for data fetching and static markup.
 - **Client Components**: Add \`"use client"\` only when interactivity (state, effects, event listeners) is needed.
@@ -188,6 +230,8 @@ export const SECTIONS: Section[] = [
     title: 'Tailwind CSS Patterns',
     category: 'frontend',
     description: 'Utility-first styling and maintainability.',
+    tags: ['css', 'tailwind', 'utility-first', 'styling', 'responsive'],
+    appliesTo: ['react', 'nextjs', 'vue'],
     content: `## Tailwind CSS Strategy
 - **Utility First**: Avoid \`@apply\` unless creating reusable base typography or complex animations.
 - **clsx / tailwind-merge**: Use these utilities to merge classes dynamically without conflicts.
@@ -200,6 +244,8 @@ export const SECTIONS: Section[] = [
     title: 'Accessibility (a11y)',
     category: 'frontend',
     description: 'ARIA, keyboard navigation, and semantic HTML.',
+    tags: ['a11y', 'accessibility', 'aria', 'wcag', 'keyboard'],
+    appliesTo: ['react', 'nextjs', 'vue', 'angular'],
     content: `## Accessibility (a11y) Standards
 - **Semantic HTML**: Use \`<button>\`, \`<nav>\`, \`<main>\`, \`<header>\` correctly. Don't use \`<div>\` with click handlers for interactive elements.
 - **Keyboard Nav**: Ensure all interactive elements are focusable and usable via keyboard.
@@ -216,6 +262,9 @@ export const SECTIONS: Section[] = [
     category: 'backend',
     description: 'Resource naming, HTTP verbs, and status codes.',
     recommended: true,
+    tags: ['rest', 'api', 'http', 'endpoints', 'status-codes'],
+    appliesTo: ['rest', 'node', 'python', 'go'],
+    conflictsWith: ['graphql-api'],
     content: `## RESTful API Standards
 - **Nouns not Verbs**: Paths should represent resources (e.g., \`/users\`, \`/orders\`), not actions (e.g., \`/getUsers\`).
 - **HTTP Methods**: Use GET for retrieval, POST for creation, PUT/PATCH for updates, DELETE for removal.
@@ -228,6 +277,9 @@ export const SECTIONS: Section[] = [
     title: 'Node.js Best Practices',
     category: 'backend',
     description: 'Event loop, Async/Await, and Error handling.',
+    tags: ['node', 'async', 'error-handling', 'validation', 'logging'],
+    appliesTo: ['node', 'typescript'],
+    requires: ['typescript-strict'],
     content: `## Node.js Best Practices
 - **Async/Await**: Use \`async/await\` over callbacks or raw promises.
 - **Error Handling**: Use a centralized error handling middleware. Extend the built-in \`Error\` class for custom errors.
@@ -243,6 +295,8 @@ export const SECTIONS: Section[] = [
     title: 'Database Indexing Strategy',
     category: 'database',
     description: 'Performance optimization for SQL/NoSQL.',
+    tags: ['database', 'indexing', 'performance', 'query', 'n+1'],
+    appliesTo: ['sql', 'nosql'],
     content: `## Database Indexing & Performance
 - **Primary Keys**: Always define a primary key. Use UUIDs or ULIDs for distributed systems; Integers for simple internal apps.
 - **Foreign Keys**: Index foreign key columns to speed up JOINs.
@@ -255,6 +309,9 @@ export const SECTIONS: Section[] = [
     title: 'Data Integrity & Transactions',
     category: 'database',
     description: 'ACID properties and data consistency.',
+    tags: ['transactions', 'acid', 'migrations', 'consistency', 'integrity'],
+    appliesTo: ['sql'],
+    requires: ['database-indexing'],
     content: `## Data Integrity
 - **ACID**: Ensure critical mutations happen within a Transaction (Atomicity, Consistency, Isolation, Durability).
 - **Migrations**: Manage schema changes via migration scripts (e.g., Prisma Migrate, Liquibase). Never change schema manually in production.
@@ -269,6 +326,8 @@ export const SECTIONS: Section[] = [
     category: 'security',
     description: 'Protecting against common web vulnerabilities.',
     recommended: true,
+    tags: ['security', 'owasp', 'injection', 'xss', 'vulnerabilities'],
+    appliesTo: ['universal'],
     content: `## Security (OWASP Top 10)
 - **Injection**: Use parameterized queries (Prepared Statements) or an ORM to prevent SQL Injection.
 - **Broken Auth**: Enforce strong passwords, implement MFA, and do not ship default credentials.
@@ -282,6 +341,9 @@ export const SECTIONS: Section[] = [
     title: 'Authentication & Authorization',
     category: 'security',
     description: 'JWT, OAuth, and RBAC.',
+    tags: ['auth', 'jwt', 'oauth', 'rbac', 'passwords'],
+    appliesTo: ['universal'],
+    requires: ['owasp-top-10'],
     content: `## Auth Standards
 - **Passwords**: Hash passwords using slow algorithms (Argon2, bcrypt). Never store plain text.
 - **JWTs**: Store short-lived access tokens in memory or httpOnly cookies. Use refresh tokens for long sessions.
@@ -296,6 +358,8 @@ export const SECTIONS: Section[] = [
     title: 'Docker & Containerization',
     category: 'devops',
     description: 'Dockerfile best practices and optimization.',
+    tags: ['docker', 'containers', 'dockerfile', 'multi-stage', 'optimization'],
+    appliesTo: ['docker', 'kubernetes'],
     content: `## Docker Best Practices
 - **Multi-stage Builds**: Use multi-stage builds to keep production images small (e.g., build in \`node:latest\`, run in \`node:alpine\`).
 - **Non-root User**: Run the application as a non-root user inside the container for security.
@@ -308,6 +372,9 @@ export const SECTIONS: Section[] = [
     title: 'CI/CD Pipelines',
     category: 'devops',
     description: 'Automation for testing and deployment.',
+    tags: ['cicd', 'automation', 'pipelines', 'deployment', 'preview'],
+    appliesTo: ['universal'],
+    requires: ['docker-containers'],
     content: `## CI/CD Guidelines
 - **Automated Testing**: Run Unit and Integration tests on every Pull Request.
 - **Linting & Formatting**: Enforce style guides (ESLint, Prettier) automatically in the pipeline.
@@ -323,6 +390,8 @@ export const SECTIONS: Section[] = [
     category: 'testing',
     description: 'Balancing Unit, Integration, and E2E tests.',
     recommended: true,
+    tags: ['testing', 'unit-tests', 'integration', 'e2e', 'coverage'],
+    appliesTo: ['universal'],
     content: `## Testing Strategy
 - **Unit Tests**: Fast, isolated tests for individual functions/classes. Should make up the majority of the suite.
 - **Integration Tests**: Verify that modules work together (e.g., API endpoint talking to a database container).
@@ -335,6 +404,9 @@ export const SECTIONS: Section[] = [
     title: 'Test-Driven Development (TDD)',
     category: 'testing',
     description: 'Red-Green-Refactor cycle.',
+    tags: ['tdd', 'red-green-refactor', 'test-first', 'coverage'],
+    appliesTo: ['universal'],
+    requires: ['testing-pyramid'],
     content: `## TDD Workflow
 1. **Red**: Write a failing test that defines the desired behavior.
 2. **Green**: Write the minimum code necessary to pass the test.
@@ -350,6 +422,9 @@ export const SECTIONS: Section[] = [
     category: 'ai-guidelines',
     description: 'Authoritative, concise, and architectural focus.',
     recommended: true,
+    tags: ['persona', 'tech-lead', 'senior', 'authoritative', 'concise'],
+    appliesTo: ['universal'],
+    conflictsWith: ['persona-pair-programmer'],
     content: `## AI Persona: Senior Tech Lead
 - **Role**: You are an expert Senior Software Engineer and Tech Lead.
 - **Tone**: Professional, concise, authoritative but helpful.
@@ -363,6 +438,9 @@ export const SECTIONS: Section[] = [
     title: 'Persona: The Pair Programmer',
     category: 'ai-guidelines',
     description: 'Collaborative, explanatory, and Socratic.',
+    tags: ['persona', 'pair-programming', 'collaborative', 'teaching', 'socratic'],
+    appliesTo: ['universal'],
+    conflictsWith: ['persona-tech-lead'],
     content: `## AI Persona: Empathetic Pair Programmer
 - **Role**: You are a helpful, collaborative pair programmer.
 - **Method**: Explain your thought process step-by-step (Chain of Thought).
@@ -376,6 +454,8 @@ export const SECTIONS: Section[] = [
     category: 'ai-guidelines',
     description: 'Strict rules for outputting code blocks.',
     recommended: true,
+    tags: ['code-generation', 'completeness', 'imports', 'comments', 'formatting'],
+    appliesTo: ['universal'],
     content: `## Code Generation Rules
 - **Completeness**: Do not leave placeholders like \`// ... rest of code\` unless explicitly asked for brevity.
 - **Language**: Always specify the language in markdown code blocks (e.g., \`\`\`typescript).
@@ -392,6 +472,8 @@ export const SECTIONS: Section[] = [
     category: 'agent-engineering',
     description: 'A predictable "README for agents" format for repo-specific setup, workflows, and constraints.',
     recommended: true,
+    tags: ['agents-md', 'documentation', 'setup', 'workflows', 'constraints'],
+    appliesTo: ['universal'],
     content: `## AGENTS.md: Repo Instructions for Agents
 - **Purpose**: Create an \`AGENTS.md\` file in your repository root to provide AI agents with structured, predictable instructions.
 - **Format**: Use markdown with clear sections (Setup, Workflows, Constraints, Testing).
@@ -408,6 +490,9 @@ export const SECTIONS: Section[] = [
     category: 'agent-engineering',
     description: 'A scalable way to grow your agent instructions without bloating the always-on context.',
     recommended: true,
+    tags: ['rules', 'skills', 'commands', 'modular', 'scalable'],
+    appliesTo: ['universal'],
+    requires: ['agents-md-format'],
     content: `## Rules vs Skills vs Commands
 - **Rules**: Always-on constraints and guidelines that apply to every interaction (e.g., "Never use \`any\` type", "Always write tests").
 - **Skills**: Modular, context-specific instructions that can be loaded on-demand (e.g., "How to implement authentication", "How to optimize database queries").

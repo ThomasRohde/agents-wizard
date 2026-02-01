@@ -4,9 +4,17 @@ import Header from './components/Header';
 import SectionCard from './components/SectionCard';
 import SearchInput from './components/SearchInput';
 import Preview from './components/Preview';
-import { GROUPS, SECTIONS } from './constants';
-import { Category, SearchResult } from './types';
-import { Sparkles, ChevronRight, SearchX } from 'lucide-react';
+import { GROUPS, SECTIONS, STACKS } from './constants';
+import { Category, SearchResult, Stack, Section } from './types';
+import { Sparkles, ChevronRight, SearchX, AlertTriangle, X, Filter } from 'lucide-react';
+
+// Conflict warning state
+interface ConflictWarning {
+  sectionId: string;
+  sectionTitle: string;
+  conflictingIds: string[];
+  conflictingTitles: string[];
+}
 
 const App: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('core-principles');
@@ -15,16 +23,26 @@ const App: React.FC = () => {
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [selectedStacks, setSelectedStacks] = useState<Set<Stack>>(new Set(['universal']));
+  const [conflictWarning, setConflictWarning] = useState<ConflictWarning | null>(null);
+  const [showStackFilter, setShowStackFilter] = useState(false);
 
-  // Initialize MiniSearch index with BM25 scoring
+  // Initialize MiniSearch index with BM25 scoring - now includes tags
   const searchIndex = useMemo(() => {
     const index = new MiniSearch({
-      fields: ['title', 'description', 'content'],
+      fields: ['title', 'description', 'content', 'tags'],
       storeFields: ['id'],
       searchOptions: {
-        boost: { title: 3, description: 2, content: 1 },
+        boost: { title: 3, description: 2, tags: 2, content: 1 },
         fuzzy: 0.2,
         prefix: true,
+      },
+      // Convert tags array to searchable string
+      extractField: (document, fieldName) => {
+        if (fieldName === 'tags') {
+          return (document as Section).tags?.join(' ') || '';
+        }
+        return (document as Record<string, string>)[fieldName];
       },
     });
     index.addAll(SECTIONS);
@@ -46,15 +64,129 @@ const App: React.FC = () => {
     setSearchResults(mappedResults);
   }, [searchIndex]);
 
-  const toggleSection = (id: string) => {
-    const newSelected = new Set(selectedIds);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
+  // Get all required sections recursively
+  const getRequiredSections = useCallback((sectionId: string, visited = new Set<string>()): string[] => {
+    if (visited.has(sectionId)) return [];
+    visited.add(sectionId);
+    
+    const section = SECTIONS.find(s => s.id === sectionId);
+    if (!section?.requires) return [];
+    
+    const required: string[] = [];
+    for (const reqId of section.requires) {
+      required.push(reqId);
+      required.push(...getRequiredSections(reqId, visited));
     }
+    return required;
+  }, []);
+
+  // Check for conflicts with currently selected sections
+  const getConflicts = useCallback((sectionId: string): string[] => {
+    const section = SECTIONS.find(s => s.id === sectionId);
+    if (!section?.conflictsWith) return [];
+    
+    return section.conflictsWith.filter(conflictId => selectedIds.has(conflictId));
+  }, [selectedIds]);
+
+  const toggleSection = useCallback((id: string) => {
+    const section = SECTIONS.find(s => s.id === id);
+    if (!section) return;
+
+    const newSelected = new Set(selectedIds);
+    
+    if (newSelected.has(id)) {
+      // Deselecting - just remove it
+      newSelected.delete(id);
+      setSelectedIds(newSelected);
+    } else {
+      // Selecting - check for conflicts first
+      const conflicts = getConflicts(id);
+      
+      if (conflicts.length > 0) {
+        // Show warning instead of blocking
+        const conflictingSections = conflicts.map(cId => SECTIONS.find(s => s.id === cId)!);
+        setConflictWarning({
+          sectionId: id,
+          sectionTitle: section.title,
+          conflictingIds: conflicts,
+          conflictingTitles: conflictingSections.map(s => s.title),
+        });
+        return;
+      }
+      
+      // No conflicts - add the section and its dependencies
+      newSelected.add(id);
+      
+      // Auto-select required sections
+      const required = getRequiredSections(id);
+      for (const reqId of required) {
+        newSelected.add(reqId);
+      }
+      
+      setSelectedIds(newSelected);
+    }
+  }, [selectedIds, getConflicts, getRequiredSections]);
+
+  // Handle conflict warning confirmation
+  const confirmConflictSelection = useCallback(() => {
+    if (!conflictWarning) return;
+    
+    const newSelected = new Set(selectedIds);
+    
+    // Remove conflicting sections
+    for (const conflictId of conflictWarning.conflictingIds) {
+      newSelected.delete(conflictId);
+    }
+    
+    // Add the new section
+    newSelected.add(conflictWarning.sectionId);
+    
+    // Auto-select its dependencies
+    const required = getRequiredSections(conflictWarning.sectionId);
+    for (const reqId of required) {
+      newSelected.add(reqId);
+    }
+    
     setSelectedIds(newSelected);
-  };
+    setConflictWarning(null);
+  }, [conflictWarning, selectedIds, getRequiredSections]);
+
+  // Toggle stack filter
+  const toggleStack = useCallback((stack: Stack) => {
+    const newStacks = new Set(selectedStacks);
+    if (newStacks.has(stack)) {
+      // Don't allow deselecting all stacks
+      if (newStacks.size > 1) {
+        newStacks.delete(stack);
+      }
+    } else {
+      newStacks.add(stack);
+    }
+    setSelectedStacks(newStacks);
+  }, [selectedStacks]);
+
+  // Filter sections by selected stacks
+  const filteredSections = useMemo(() => {
+    return SECTIONS.filter(section => {
+      // If section has no appliesTo, show it always
+      if (!section.appliesTo || section.appliesTo.length === 0) return true;
+      // If section applies to 'universal', always show
+      if (section.appliesTo.includes('universal')) return true;
+      // Check if any of the section's stacks match selected stacks
+      return section.appliesTo.some(stack => selectedStacks.has(stack));
+    });
+  }, [selectedStacks]);
+
+  // Get sections that require a given section (reverse dependency)
+  const getSectionsDependingOn = useCallback((sectionId: string): Section[] => {
+    return SECTIONS.filter(s => s.requires?.includes(sectionId));
+  }, []);
+
+  // Get sections that conflict with a given section
+  const getConflictingSections = useCallback((sectionId: string): Section[] => {
+    return SECTIONS.filter(s => s.conflictsWith?.includes(sectionId) || 
+      SECTIONS.find(sec => sec.id === sectionId)?.conflictsWith?.includes(s.id));
+  }, []);
 
   const generatedContent = useMemo(() => {
     const header = `# AGENTS.md
@@ -82,6 +214,50 @@ const App: React.FC = () => {
     <div className="h-screen flex flex-col font-sans bg-slate-950 text-slate-50 selection:bg-indigo-500/30 overflow-hidden">
       <Header />
 
+      {/* Conflict Warning Modal */}
+      {conflictWarning && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 bg-amber-500/20 rounded-lg shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-white">Conflicting Sections</h3>
+                <p className="text-sm text-slate-400 mt-1">
+                  <span className="text-indigo-400 font-medium">{conflictWarning.sectionTitle}</span> conflicts with:
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {conflictWarning.conflictingTitles.map((title, i) => (
+                    <li key={i} className="text-sm text-amber-300 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
+                      {title}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400 mb-5">
+              Selecting this will automatically deselect the conflicting section{conflictWarning.conflictingIds.length > 1 ? 's' : ''}.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConflictWarning(null)}
+                className="flex-1 px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmConflictSelection}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+              >
+                Replace Selection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 lg:p-6 overflow-hidden">
         <div className="flex flex-col lg:flex-row gap-6 h-full">
           
@@ -99,6 +275,48 @@ const App: React.FC = () => {
                   debounceMs={200}
                 />
               </div>
+
+              {/* Stack Filter Toggle */}
+              <button
+                onClick={() => setShowStackFilter(!showStackFilter)}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-sm font-medium ${
+                  showStackFilter 
+                    ? 'bg-indigo-600/20 border-indigo-500/50 text-indigo-300' 
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  Stack Filter
+                </span>
+                <span className="text-xs bg-slate-800 px-2 py-0.5 rounded-full">
+                  {selectedStacks.size} selected
+                </span>
+              </button>
+
+              {/* Stack Filter Panel */}
+              {showStackFilter && (
+                <div className="bg-slate-900 rounded-xl border border-slate-800 p-3 shadow-sm">
+                  <div className="flex flex-wrap gap-1.5">
+                    {STACKS.map(stack => (
+                      <button
+                        key={stack.value}
+                        onClick={() => toggleStack(stack.value)}
+                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all ${
+                          selectedStacks.has(stack.value)
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
+                        }`}
+                      >
+                        {stack.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-2">
+                    Filter sections by your tech stack
+                  </p>
+                </div>
+              )}
 
                <nav className={`bg-slate-900 rounded-xl border border-slate-800 p-2 shadow-sm flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible no-scrollbar ${searchQuery ? 'opacity-50 pointer-events-none' : ''}`}>
                 {GROUPS.map(group => (
@@ -175,6 +393,8 @@ const App: React.FC = () => {
                         isSelected={selectedIds.has(section.id)}
                         onToggle={toggleSection}
                         searchScore={score}
+                        selectedIds={selectedIds}
+                        allSections={SECTIONS}
                       />
                     ))
                   ) : (
@@ -185,12 +405,14 @@ const App: React.FC = () => {
                     </div>
                   )
                 ) : (
-                  SECTIONS.filter(s => s.category === activeCategory).map(section => (
+                  filteredSections.filter(s => s.category === activeCategory).map(section => (
                     <SectionCard 
                       key={section.id} 
                       section={section} 
                       isSelected={selectedIds.has(section.id)}
                       onToggle={toggleSection}
+                      selectedIds={selectedIds}
+                      allSections={SECTIONS}
                     />
                   ))
                 )}
