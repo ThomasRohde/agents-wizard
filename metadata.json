@@ -1,0 +1,5 @@
+{
+  "name": "Agents Wizard",
+  "description": "A static web app to assemble AGENTS.md files for agentic coding, anchored in software classics and modern tech stacks.",
+  "requestFramePermissions": []
+}
